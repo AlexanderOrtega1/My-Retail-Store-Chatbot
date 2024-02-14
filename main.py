@@ -8,7 +8,6 @@ user_acc = [{'alex1': '1234'}, {'alex2': '5678'}]
 emp_acc = [{'Alex': '1234'}, {'Jack': '4321'}]
 list_index = 0
 
-
 admin_code = "admin" # change this later#
 textSeperator = '==================================================================='
 
