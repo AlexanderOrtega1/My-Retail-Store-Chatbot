@@ -1,11 +1,41 @@
 import os
 import time
 
+
 # # # variables/lists # # #
-storeinv = [2]
-used_PIDs = [1]
-user_acc = [{'alex1': '1234'}, {'alex2': '5678'}]
-emp_acc = [{'Alex': '1234'}, {'Jack': '4321'}]
+storeinv = []
+used_PIDs = []
+user_acc = []
+emp_acc = []
+print(emp_acc)
+try:
+  f = open("store.inv", "r")
+  storeinv = eval(f.read())
+  f.close()
+except:
+  storeinv = []
+
+try:
+  f = open("used.PIDs", "r")
+  used_PIDs = eval(f.read())
+  f.close()
+except:
+  used_PIDs = []
+
+try:
+  f = open("user.acc", "r")
+  user_acc = eval(f.read())
+  f.close()
+except:
+  user_acc = []
+
+try:
+  f = open("emp.acc", "r")
+  emp_acc = eval(f.read())
+  f.close()
+except:
+  emp_acc = []
+print(emp_acc)
 list_index = 0
 
 admin_code = "admin" # change this later#
