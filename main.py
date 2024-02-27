@@ -132,14 +132,58 @@ def returning_acc(email, password):
     print('Account not found')
     textSep()
     return True
+def create_emp_account(email, password):
+  new_account = AccountCreation(email, password)
+  if emp_acc == []:
+    emp_acc.append(new_account.create_account())
+    user_account_file_write()
+  else:
+    if any(account['email'] == email for account in emp_acc):
+      print("Email already in use")
+      print(textSeperator)
+      return True
+    else:
+      emp_acc.append(new_account.create_account())
+      employee_account_file_write()
+      return False
+def returning_emp_acc(email, password):
+  if any(acc['email'] == email for acc in emp_acc):
+    for account in emp_acc:
+      if account['email'] == email:
+        if account['password'] == password:
+          print('Successfully logged in!')
+          textSep()
+          return False
+        else:
+          password_tries = True
+          while password_tries is True:
+            print('Incorrect password\n')
+            timeClear(1)
+            textSep()
+            print(f'Email: {email}')
+            password = input('Password: ')
+            if account['password'] == password:
+              print('Successfully logged in!')
+              textSep()
+              password_tries = False
+              return False
+            else:
+              continue
+          break
+      else:
+        continue
+  else:
+    print('Account not found')
+    textSep()
+    return True
 
-def printMenu():
+def print_customer_Menu():
   print(textSeperator)
   print('Choose one of the following options:')
   print('''  1. Operating Hours
   2. Store Inventory
   3. Return an item
-  4. PlaceHolder 3
+  4. Purchase an item
   5. Exit''')
   print(textSeperator)
 
@@ -154,8 +198,8 @@ def workingHours():
     print()
   print(textSeperator)
   nextText()
-
 def display_inventory():
+  textSep()
   print("\n **Elite 101 Retail Store Inventory**")
   for product in store_inv:
       print("----------------------------")
@@ -163,7 +207,6 @@ def display_inventory():
         print(f"{key}:{value}")          
   print("___________________________")
   nextText()
-
 def returning_product():
   to_return_index = -1
   textSep()
@@ -191,7 +234,32 @@ def returning_product():
     print('Successfully returned item')
     timeClear(2)
 
+def purchasing_product():
+  to_purchase_index = -1
+  textSep()
+  print('\n**Purchasing Item**\n')
+  textSep()
+  try:
+    PID = int(input('Enter the Product ID number: '))
+  except ValueError:
+    PID = 0
+  for i, product in enumerate(store_inv):
+    if store_inv[i]['product_id'] == PID:
+      to_purchase_index = i
+      break
+  if to_purchase_index == -1:
+    print('Product ID not found')
+  else:
+    returned_product = store_inv[to_purchase_index]
+    store_inv.pop(to_purchase_index)
+    returned_product['total'] -= 1
+    store_inv.append(returned_product)
+    store_inv_file_write()
 
+    store_money[0] += returned_product['price']
+    store_money_file_write()
+    print('Successfully purchased item')
+    timeClear(2)
 # # # # # # # M A I N # # # # # # #
 # login stuffs #
 textSep()
@@ -201,7 +269,9 @@ print('Are you new or are you returning?')
 returning = input('1. New\n2. Returning\n> ').lower()
 os.system('clear')
 print(textSeperator)
+employee = False
 if returning == '1' or returning == 'new':
+  employee = False
   creating_acc = True
   while creating_acc is True:
     os.system('clear')
@@ -215,11 +285,12 @@ if returning == '1' or returning == 'new':
       print('Account created successfully!')
       print(textSeperator)
       creating_acc = False
+      timeClear(1)
     elif new_acc is True:
       time.sleep(2)
       continue
-
 elif returning == '2' or returning == 'returning':
+  employee = False
   logging_in = True
   while logging_in is True:
     os.system('clear')
@@ -228,29 +299,64 @@ elif returning == '2' or returning == 'returning':
     returning_password = input('Password: ')
     logging_in = returning_acc(returning_email, returning_password)
     timeClear(1)
-
+elif returning == admin_code:
+  print('Welcome Employee!!\n')
+  print('Are you new or returning?')
+  returning_employee = input('1. New\n2. Returning\n> ').lower()
+  os.system('clear')
+  if returning_employee == '1' or returning_employee == 'new':
+    employee = True
+    creating_acc = True
+    while creating_acc is True:
+      os.system('clear')
+      print(textSeperator)
+      print('Welcome new user!!\n')
+      print('Please enter your email and password to create an account!\n')
+      new_acc_email = input('Email: ')
+      new_acc_password = input('Password: ')
+      new_acc = create_emp_account(new_acc_email, new_acc_password)
+      if new_acc is False:
+        print('Account created successfully!')
+        print(textSeperator)
+        creating_acc = False
+        timeClear(1)
+      elif new_acc is True:
+        time.sleep(2)
+        continue
+  elif returning_employee == '2' or returning_employee == 'returning':
+    employee = True
+    logging_in = True
+    while logging_in is True:
+      os.system('clear')
+      textSep()
+      returning_email = input('Email: ')
+      returning_password = input('Password: ')
+      logging_in = returning_emp_acc(returning_email, returning_password)
+      timeClear(1)
+  
 # # # # # # Menu # # # # # #
-using = True
-while using == True:
-  printMenu()
-  menuChoice = input('What would you like to do?: ')
-  print(textSeperator)
-  if menuChoice == '1':
-    timeClear(1)
-    workingHours()
-    timeClear(1)
-  elif menuChoice == '2':
-    timeClear(1)
-    display_inventory()
-    timeClear(1)
-  elif menuChoice == '3':
-    timeClear(1)
-    returning_product()
-    timeClear(1)
-  elif menuChoice == '4':
-    timeClear(1)
-    print('PlaceHolder 4')
-    timeClear(1)
-  elif menuChoice == '5':
-    print('Exiting...')
-    using = False
+if employee is False:
+  using = True
+  while using == True:
+    print_customer_Menu()
+    menuChoice = input('What would you like to do?: ')
+    print(textSeperator)
+    if menuChoice == '1':
+      timeClear(1)
+      workingHours()
+      timeClear(1)
+    elif menuChoice == '2':
+      timeClear(1)
+      display_inventory()
+      timeClear(1)
+    elif menuChoice == '3':
+      timeClear(1)
+      returning_product()
+      timeClear(1)
+    elif menuChoice == '4':
+      timeClear(1)
+      purchasing_product()
+      timeClear(1)
+    elif menuChoice == '5':
+      print('Exiting...')
+      using = False
