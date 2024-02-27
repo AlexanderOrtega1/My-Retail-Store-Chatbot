@@ -1,1 +1,1 @@
-[]
+[{'product_id': 4327, 'type': 'Shoes', 'price': 100.0, 'total': 20}, {'product_id': 3915, 'type': 'Tshirts', 'price': 43.5, 'total': 32}, {'product_id': 2119, 'type': 'Pants', 'price': 34.0, 'total': 19}, {'product_id': 1194, 'type': 'Jumpers', 'price': 250.0, 'total': 5}, {'product_id': 1300, 'type': 'Blouse', 'price': 24.76, 'total': 3}, {'product_id': 1118, 'type': 'Dress', 'price': 50.0, 'total': 10}, {'product_id': 1664, 'type': 'Suits', 'price': 250, 'total': 7}]

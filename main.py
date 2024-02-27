@@ -7,6 +7,7 @@ store_inv = []
 used_PIDs = []
 user_acc = []
 emp_acc = []
+store_money = []
 scheduleList = ['Monday: 10am - 9pm',
   'Tuesday: 10am - 9pm',
   'Wednesday: 10am - 9pm',
@@ -31,6 +32,10 @@ def used_PIDs_file_write():
 def store_inv_file_write():
   f = open('store.inv', 'w')
   f.write(str(store_inv))
+  f.close()
+def store_money_file_write():
+  f = open('store.money', 'w')
+  f.write(str(store_money))
   f.close()
 try:
   f = open("store.inv", "r")
@@ -60,6 +65,13 @@ try:
 except:
   emp_acc = []
   employee_account_file_write()
+try:
+  f = open("store.money", "r")
+  store_money = eval(f.read())
+  f.close()
+except:
+  store_money = []
+  store_money_file_write()
 # # # # # # # # # # # # # # # #
   
 list_index = 0
@@ -73,6 +85,8 @@ def timeClear(t):
   os.system("clear")
 def textSep():
   print(textSeperator)
+def nextText():
+  nextText = input('Press enter to continue: ')
 
 def create_account(email, password):
   new_account = AccountCreation(email, password)
@@ -88,7 +102,6 @@ def create_account(email, password):
       user_acc.append(new_account.create_account())
       user_account_file_write()
       return False
-
 def returning_acc(email, password):
   if any(acc['email'] == email for acc in user_acc):
     for account in user_acc:
@@ -120,16 +133,14 @@ def returning_acc(email, password):
     textSep()
     return True
 
-def nextText():
-  nextText = input('Press enter to continue: ')
-
 def printMenu():
   print(textSeperator)
   print('Choose one of the following options:')
   print('''  1. Operating Hours
-  2. PlaceHolder 2
-  3. PlaceHolder 3
-  4. Exit''')
+  2. Store Inventory
+  3. Return an item
+  4. PlaceHolder 3
+  5. Exit''')
   print(textSeperator)
 
 def workingHours():
@@ -144,6 +155,43 @@ def workingHours():
   print(textSeperator)
   nextText()
 
+def display_inventory():
+  print("\n **Elite 101 Retail Store Inventory**")
+  for product in store_inv:
+      print("----------------------------")
+      for key, value in product.items():            
+        print(f"{key}:{value}")          
+  print("___________________________")
+  nextText()
+
+def returning_product():
+  to_return_index = -1
+  textSep()
+  print('\n**Returning Item**\n')
+  textSep()
+  try:
+    PID = int(input('Enter the Product ID number: '))
+  except ValueError:
+    PID = 0
+  for i, product in enumerate(store_inv):
+    if store_inv[i]['product_id'] == PID:
+      to_return_index = i
+      break
+  if to_return_index == -1:
+    print('Product ID not found')
+  else:
+    returned_product = store_inv[to_return_index]
+    store_inv.pop(to_return_index)
+    returned_product['total'] += 1
+    store_inv.append(returned_product)
+    store_inv_file_write()
+
+    store_money[0] -= returned_product['price']
+    store_money_file_write()
+    print('Successfully returned item')
+    timeClear(2)
+
+
 # # # # # # # M A I N # # # # # # #
 # login stuffs #
 textSep()
@@ -153,7 +201,6 @@ print('Are you new or are you returning?')
 returning = input('1. New\n2. Returning\n> ').lower()
 os.system('clear')
 print(textSeperator)
-
 if returning == '1' or returning == 'new':
   creating_acc = True
   while creating_acc is True:
@@ -175,11 +222,12 @@ if returning == '1' or returning == 'new':
 elif returning == '2' or returning == 'returning':
   logging_in = True
   while logging_in is True:
-    timeClear(2)
+    os.system('clear')
     textSep()
     returning_email = input('Email: ')
     returning_password = input('Password: ')
     logging_in = returning_acc(returning_email, returning_password)
+    timeClear(1)
 
 # # # # # # Menu # # # # # #
 using = True
@@ -188,14 +236,21 @@ while using == True:
   menuChoice = input('What would you like to do?: ')
   print(textSeperator)
   if menuChoice == '1':
+    timeClear(1)
     workingHours()
     timeClear(1)
   elif menuChoice == '2':
-    print('PlaceHolder 2')
+    timeClear(1)
+    display_inventory()
     timeClear(1)
   elif menuChoice == '3':
-    print('PlaceHolder 3')
+    timeClear(1)
+    returning_product()
     timeClear(1)
   elif menuChoice == '4':
+    timeClear(1)
+    print('PlaceHolder 4')
+    timeClear(1)
+  elif menuChoice == '5':
     print('Exiting...')
     using = False
