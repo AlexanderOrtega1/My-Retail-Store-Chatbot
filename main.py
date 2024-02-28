@@ -96,8 +96,6 @@ except:
   store_money = []
   store_money_file_write()
 # # # # # # # # # # # # # # # #
-  
-list_index = 0
 
 admin_code = "admin" # change this later#
 textSeperator = '==================================================================='
