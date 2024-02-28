@@ -6,5 +6,3 @@ class AccountCreation:
 
   def create_account(self):
     return {'email': self.email, 'password': self.password}
-
-

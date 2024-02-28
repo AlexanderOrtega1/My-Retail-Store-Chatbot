@@ -1,5 +1,6 @@
 import os
 import time
+import random
 from class_file import AccountCreation
 
 # # # # # # # variables/lists # # # # # # #
@@ -16,6 +17,28 @@ scheduleList = ['Monday: 10am - 9pm',
   'Saturday: 8am - 11pm',
   'Sunday: 8am - 11pm']
 
+# # # product creation class # # #
+class ProductCreation:
+  #constructor method used to instantiate any new class
+  def __init__(self, type, price, total):
+    newPID = True
+    self.product_id = random.randint(1000,5000)  # new attribute added
+    while newPID is True:
+      self.product_id = random.randint(1000,5000)
+      if self.product_id not in used_PIDs:
+        used_PIDs.append(self.product_id)
+        used_PIDs_file_write()
+        newPID = False
+    self.type = type
+    self.price = price
+    self.total = total
+
+  def features(self):
+    return {"product_id":self.product_id,
+            "type":self.type,
+            "price":self.price,
+            "total":self.total
+            }
 # # # saving functions # # #
 def user_account_file_write():
   f = open('user.acc', 'w')
@@ -93,6 +116,7 @@ def create_account(email, password):
   if user_acc == []:
     user_acc.append(new_account.create_account())
     user_account_file_write()
+    return False
   else:
     if any(account['email'] == email for account in user_acc):
       print("Email already in use")
@@ -136,7 +160,8 @@ def create_emp_account(email, password):
   new_account = AccountCreation(email, password)
   if emp_acc == []:
     emp_acc.append(new_account.create_account())
-    user_account_file_write()
+    employee_account_file_write()
+    return False
   else:
     if any(account['email'] == email for account in emp_acc):
       print("Email already in use")
@@ -178,14 +203,23 @@ def returning_emp_acc(email, password):
     return True
 
 def print_customer_Menu():
-  print(textSeperator)
+  textSep()
   print('Choose one of the following options:')
   print('''  1. Operating Hours
   2. Store Inventory
   3. Return an item
   4. Purchase an item
   5. Exit''')
-  print(textSeperator)
+  textSep()
+def print_employee_Menu():
+  textSep()
+  print('Choose one of the following options:')
+  print('''  1. Store Inventory
+  2. Store Balance
+  3. Add a product
+  4. Remove a product
+  5. Exit''')
+  textSep()
 
 def workingHours():
   timeClear(0.5)
@@ -202,10 +236,10 @@ def display_inventory():
   textSep()
   print("\n **Elite 101 Retail Store Inventory**")
   for product in store_inv:
-      print("----------------------------")
+      textSep()
       for key, value in product.items():            
         print(f"{key}:{value}")          
-  print("___________________________")
+  textSep()
   nextText()
 def returning_product():
   to_return_index = -1
@@ -233,7 +267,6 @@ def returning_product():
     store_money_file_write()
     print('Successfully returned item')
     timeClear(2)
-
 def purchasing_product():
   to_purchase_index = -1
   textSep()
@@ -260,6 +293,57 @@ def purchasing_product():
     store_money_file_write()
     print('Successfully purchased item')
     timeClear(2)
+
+def display_store_balance():
+  textSep()
+  print(f'\nStore Balance: ${store_money[0]}\n')
+  textSep()
+  nextText()
+def add_new_product():    
+  print("\n **Adding A New Product To The Inventory**")
+  textSep()
+  type = input("Enter a type(Shoes, Jacket,...): ").capitalize()
+  try:
+      price = float(input("Enter a price: "))
+  except ValueError:
+      price = 0.0
+  try:
+      total = int(input("Enter a total: "))
+  except ValueError:
+      total = 0.0
+
+  if price > 0 and total > 0:
+      new_product = ProductCreation(type, price, total)      
+      store_inv.append(new_product.features())
+      display_inventory()
+      store_inv_file_write()
+
+  else:
+      print(
+          "Invalid Price or/and Total. Product not Added to the Inventory ")
+def remove_product():  
+  to_delete_index = -1
+  display_inventory()
+  print("\n **Removing A Product From The Inventory**")
+  textSep()
+  try:
+    PID = int(input("Enter Product ID Number to Remove: "))
+  except ValueError:
+    PID = 0
+  for i, product in enumerate(store_inv):           
+    if store_inv[i]["product_id"] == PID:
+        to_delete_index = i
+        break
+
+  if to_delete_index == -1:
+    print("This is not in the inventory. Try again.")
+  else:       
+    store_inv.pop(to_delete_index)
+    print("Product was successfully removed from the store inventory.")
+    store_inv_file_write()
+    used_PIDs.pop(to_delete_index)
+    used_PIDs_file_write()
+    
 # # # # # # # M A I N # # # # # # #
 # login stuffs #
 textSep()
@@ -319,6 +403,7 @@ elif returning == admin_code:
         print('Account created successfully!')
         print(textSeperator)
         creating_acc = False
+        employee = True
         timeClear(1)
       elif new_acc is True:
         time.sleep(2)
@@ -337,10 +422,10 @@ elif returning == admin_code:
 # # # # # # Menu # # # # # #
 if employee is False:
   using = True
-  while using == True:
+  while using is True:
     print_customer_Menu()
     menuChoice = input('What would you like to do?: ')
-    print(textSeperator)
+    textSep()
     if menuChoice == '1':
       timeClear(1)
       workingHours()
@@ -360,3 +445,33 @@ if employee is False:
     elif menuChoice == '5':
       print('Exiting...')
       using = False
+    else:
+      print('Invalid Option')
+
+elif employee is True:
+  using = True
+  while using is True:
+    print_employee_Menu()
+    menuChoice = input('What would you like to do?: ')
+    textSep()
+    if menuChoice == '1':
+      timeClear(1)
+      display_inventory()
+      timeClear(1)
+    elif menuChoice == '2':
+      timeClear(1)
+      display_store_balance()
+      timeClear(1)
+    elif menuChoice == '3':
+      timeClear(1)
+      add_new_product()
+      timeClear(1)
+    elif menuChoice == '4':
+      timeClear(1)
+      remove_product()
+      timeClear(1)
+    elif menuChoice == '5':
+      print('Exiting...')
+      using = False
+    else:
+      print('Invalid input')
